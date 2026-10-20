@@ -1,0 +1,98 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Staff Login | BGC Logistics</title><link rel="icon" href="logo.png"><link rel="stylesheet" href="style.css"></head><body>
+<header class="top"><div class="wrap"><a href="index.html" aria-label="BGC Logistics home"><img src="logo.png" alt="BGC Logistics logo"></a><b>Staff area</b></div></header>
+<main><section><div class="wrap">
+<div id="login">
+ <h1 style="font-size:clamp(1.8rem,6vw,2.6rem)">Staff login</h1>
+ <form id="loginForm">
+  <label for="em">Email<input id="em" type="email" autocomplete="username" required></label>
+  <label for="pw">Password<input id="pw" type="password" autocomplete="current-password" required></label>
+  <button class="btn" type="submit">Log in</button>
+ </form>
+ <p id="loginMsg" role="status"></p>
+</div>
+<div id="panel" style="display:none">
+ <h1 style="font-size:clamp(1.8rem,6vw,2.6rem)">Packages</h1>
+ <p class="note">Customers can see the status and note you type. Never type a customer’s phone number or address.</p>
+ <h2>Add a package</h2>
+ <form id="addForm">
+  <label for="addStatus">Status<select id="addStatus"></select></label>
+  <label for="addNote">Note for customer (optional)<input id="addNote" type="text" maxlength="200"></label>
+  <button class="btn" type="submit">Add package</button>
+ </form>
+ <p id="addMsg" role="status"></p>
+ <h2 style="margin-top:32px">Update a package</h2>
+ <form id="upForm">
+  <label for="upCode">Tracking number<input id="upCode" type="text" autocapitalize="characters" autocomplete="off" required></label>
+  <label for="upStatus">New status<select id="upStatus"></select></label>
+  <label for="upNote">Note for customer (optional)<input id="upNote" type="text" maxlength="200"></label>
+  <button class="btn" type="submit">Update status</button>
+ </form>
+ <p id="upMsg" role="status"></p>
+ <h2 style="margin-top:32px">Recent packages</h2>
+ <p class="note">Tap a package to fill in its tracking number above.</p>
+ <div id="list" class="list" style="grid-template-columns:1fr"></div>
+ <div class="bar"><button class="btn" id="out" type="button">Log out</button></div>
+</div>
+</div></section></main>
+<script>
+(function(){
+ var BASE="https://rtygothuagxvqoojcykb.supabase.co";
+ var KEY="sb_publishable_itNJRAdWKG0yzgMiokG_gw_DVHdfC10";
+ var token=null;
+ var STATUSES=["Booking Received","Confirmed","Picked Up","In Transit","Arrived at Branch","Out for Delivery","Delivered","Delivery Attempted","Delayed","Cancelled"];
+ function $(id){return document.getElementById(id);}
+ function fill(sel){STATUSES.forEach(function(s){var o=document.createElement("option");o.value=s;o.textContent=s;sel.appendChild(o);});}
+ fill($("addStatus"));fill($("upStatus"));
+ function api(path,o){
+  o=o||{};
+  var h={"apikey":KEY,"Content-Type":"application/json"};
+  if(token)h["Authorization"]="Bearer "+token;
+  if(o.prefer)h["Prefer"]=o.prefer;
+  return fetch(BASE+path,{method:o.method||"GET",headers:h,body:o.body?JSON.stringify(o.body):undefined}).then(function(r){
+   return r.text().then(function(t){
+    var d=null;try{d=t?JSON.parse(t):null;}catch(e){}
+    if(!r.ok){throw new Error((d&&(d.msg||d.message||d.error_description))||"Something went wrong. Please log in again.");}
+    return d;
+   });
+  });
+ }
+ function when(s){try{return new Date(s).toLocaleString("en-NG",{timeZone:"Africa/Lagos",day:"numeric",month:"short",hour:"numeric",minute:"2-digit"});}catch(e){return "";}}
+ function loadList(){
+  api("/rest/v1/shipments?select=tracking_number,status,created_at&order=created_at.desc&limit=20").then(function(rows){
+   var box=$("list");while(box.firstChild)box.removeChild(box.firstChild);
+   if(!rows||!rows.length){var p=document.createElement("p");p.textContent="No packages yet.";box.appendChild(p);return;}
+   rows.forEach(function(r){
+    var b=document.createElement("button");b.type="button";b.className="item";b.style.cssText="text-align:left;font:inherit;cursor:pointer;border:0;border-left:5px solid #D4AF37;width:100%";
+    var t=document.createElement("b");t.textContent=r.tracking_number;
+    var s=document.createElement("div");s.textContent=r.status+" · added "+when(r.created_at);
+    b.appendChild(t);b.appendChild(s);
+    b.addEventListener("click",function(){$("upCode").value=r.tracking_number;$("upStatus").value=r.status;$("upCode").scrollIntoView({behavior:"smooth",block:"center"});});
+    box.appendChild(b);
+   });
+  }).catch(function(e){$("list").textContent=e.message;});
+ }
+ $("loginForm").addEventListener("submit",function(ev){
+  ev.preventDefault();$("loginMsg").textContent="Logging in…";
+  api("/auth/v1/token?grant_type=password",{method:"POST",body:{email:$("em").value.trim(),password:$("pw").value}}).then(function(d){
+   token=d.access_token;$("pw").value="";$("login").style.display="none";$("panel").style.display="block";loadList();
+  }).catch(function(){$("loginMsg").textContent="Login failed. Check your email and password.";});
+ });
+ $("addForm").addEventListener("submit",function(ev){
+  ev.preventDefault();$("addMsg").textContent="Adding…";
+  api("/rest/v1/shipments",{method:"POST",prefer:"return=representation",body:{status:$("addStatus").value,note:$("addNote").value.trim()||null}}).then(function(d){
+   $("addMsg").textContent="Package added. Tracking number: "+d[0].tracking_number+". Give this number to the customer.";
+   $("addNote").value="";loadList();
+  }).catch(function(e){$("addMsg").textContent=e.message;});
+ });
+ $("upForm").addEventListener("submit",function(ev){
+  ev.preventDefault();$("upMsg").textContent="Updating…";
+  var code=$("upCode").value.trim().toUpperCase();
+  api("/rest/v1/shipments?tracking_number=eq."+encodeURIComponent(code),{method:"PATCH",prefer:"return=representation",body:{status:$("upStatus").value,note:$("upNote").value.trim()||null}}).then(function(d){
+   if(!d||!d.length){$("upMsg").textContent="That tracking number was not found.";return;}
+   $("upMsg").textContent="Updated: "+code+" is now "+d[0].status+".";$("upNote").value="";loadList();
+  }).catch(function(e){$("upMsg").textContent=e.message;});
+ });
+ $("out").addEventListener("click",function(){token=null;$("panel").style.display="none";$("login").style.display="block";$("loginMsg").textContent="";});
+})();
+</script>
+</body></html>
