@@ -1,0 +1,71 @@
+:root{--black:#151515;--deep:#080808;--gold:#D4AF37;--bronze:#A85D24;--light:#F3D27A;--off:#F7F6F2;--grey:#333;--muted:#6B6B6B}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:110px}
+body{margin:0;font:17px/1.6 "Segoe UI",Roboto,Arial,sans-serif;color:var(--grey);background:#fff}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+h1,h2,h3{font-family:"Trebuchet MS","Segoe UI",Roboto,Arial,sans-serif;line-height:1.15;margin:0 0 .5em;color:var(--black)}
+h1{font-size:clamp(2rem,7vw,3.4rem);font-weight:800}
+h2{font-size:clamp(1.6rem,5vw,2.3rem);font-weight:800}
+h3{font-size:1.15rem}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+section{padding:56px 0}
+.btn{display:inline-block;padding:14px 22px;border-radius:6px;font-weight:700;text-decoration:none;border:2px solid var(--gold);background:var(--gold);color:var(--deep);font-size:1rem;cursor:pointer;font-family:inherit}
+.btn.ghost{background:transparent;color:#fff}
+.btn:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--bronze);outline-offset:2px}
+.top{position:sticky;top:0;z-index:10;background:#fff;border-bottom:4px solid var(--gold)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:6px;padding-bottom:6px}
+.top img{height:56px;width:auto}
+.top .btn{padding:10px 16px;font-size:.95rem}
+nav{background:var(--black);overflow-x:auto;white-space:nowrap}
+nav .wrap{display:flex;gap:4px}
+nav a{color:#fff;text-decoration:none;padding:12px 14px;font-weight:600;font-size:.95rem}
+nav a:hover{color:var(--gold)}
+.hero{background:var(--deep);color:#fff;padding:48px 0}
+.hero h1{color:#fff}
+.hero p{color:#ddd;max-width:34em}
+.hero .grid{display:grid;gap:28px;align-items:center}
+.hero img{border-radius:8px;border:3px solid var(--gold)}
+.hero .sub{color:var(--light);font-weight:700;font-size:1.05rem;margin-bottom:8px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.services{background:var(--off)}
+.list{display:grid;gap:14px;grid-template-columns:1fr}
+.item{background:#fff;border-left:5px solid var(--gold);padding:16px 18px}
+.item p{margin:0;font-size:.97rem}
+.why{display:grid;gap:18px}
+.why div{border-top:3px solid var(--bronze);padding-top:10px}
+.why p{margin:0}
+ol.steps{list-style:none;counter-reset:s;padding:0;margin:0;display:grid;gap:14px}
+ol.steps li{counter-increment:s;padding-left:54px;position:relative}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:38px;height:38px;border-radius:50%;background:var(--black);color:var(--gold);font-weight:800;display:grid;place-items:center}
+ol.steps b{color:var(--black)}
+.dark{background:var(--black);color:#ddd}
+.dark h2,.dark h3{color:#fff}
+.dark .item{background:#222;color:#ddd}
+.dark .item h3{color:var(--light)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:0;list-style:none;margin:14px 0}
+.chips li{background:var(--off);border:1px solid #ddd;padding:6px 12px;border-radius:99px;font-size:.93rem}
+.branches{display:grid;gap:14px}
+form{display:grid;gap:14px;max-width:640px}
+label{font-weight:600;color:var(--black);display:grid;gap:4px;font-size:.97rem}
+input,select,textarea{font:inherit;padding:12px;border:2px solid #bbb;border-radius:6px;background:#fff;width:100%;color:var(--grey)}
+.note{font-size:.92rem;color:var(--muted)}
+.dark .note{color:#aaa}
+.contact a{color:var(--bronze);font-weight:700}
+.row{display:grid;gap:14px}
+footer{background:var(--deep);color:#bbb;padding:36px 0;font-size:.95rem}
+footer a{color:var(--light)}
+footer img{height:70px;width:auto;background:#fff;padding:4px 8px;border-radius:6px;margin-bottom:12px}
+.hp{position:absolute;left:-9999px}
+@media(min-width:760px){
+ .hero .grid{grid-template-columns:1.1fr .9fr}
+ .list{grid-template-columns:repeat(3,1fr)}
+ .why{grid-template-columns:repeat(5,1fr)}
+ .branches{grid-template-columns:1fr 1fr}
+ .row{grid-template-columns:1fr 1fr}
+ ol.steps{grid-template-columns:repeat(5,1fr)}
+ ol.steps li{padding:50px 0 0}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.bar{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+ul.plain{padding-left:20px}ul.plain li{margin-bottom:6px}

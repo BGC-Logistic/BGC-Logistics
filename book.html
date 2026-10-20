@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Book a Delivery | BGC Logistics</title><meta name="description" content="Book a pickup and delivery with BGC Logistics in Lagos or across Nigeria."><meta property="og:title" content="Book a Delivery | BGC Logistics"><meta property="og:image" content="logo.png"><meta name="theme-color" content="#151515"><link rel="icon" href="logo.png"><link rel="stylesheet" href="style.css"></head><body>
+<header class="top"><div class="wrap"><a href="index.html" aria-label="BGC Logistics home"><img src="logo.png" alt="BGC Logistics logo"></a><a class="btn" href="book.html">Book a Delivery</a></div><nav aria-label="Main"><div class="wrap"><a href="index.html">Home</a><a href="about.html">About Us</a><a href="services.html">Services</a><a href="locations.html">Delivery Locations</a><a href="vendors.html">E-Commerce Vendors</a><a href="partnerships.html">Partnerships</a><a href="track.html">Track Package</a><a href="contact.html">Contact</a></div></nav></header>
+<main><section class="services"><div class="wrap"><h1 style="font-size:clamp(1.8rem,6vw,2.6rem)">Book a Delivery</h1><p>Fill in the form and our team will contact you to confirm your booking, delivery charge and pickup time.</p><form name="booking" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+   <input type="hidden" name="form-name" value="booking">
+   <p class="hp"><label>Leave this empty <input name="bot-field"></label></p>
+   <div class="row">
+    <label>Your name <input name="customer_name" required autocomplete="name"></label>
+    <label>Your phone number <input name="customer_phone" type="tel" required autocomplete="tel"></label>
+   </div>
+   <label>Your email (optional) <input name="customer_email" type="email" autocomplete="email"></label>
+   <label>Pickup address <input name="pickup_address" required></label>
+   <div class="row">
+    <label>Recipient name <input name="recipient_name" required></label>
+    <label>Recipient phone number <input name="recipient_phone" type="tel" required></label>
+   </div>
+   <label>Delivery address <input name="delivery_address" required></label>
+   <label>Destination city or state <input name="destination" required></label>
+   <label>What are you sending? <textarea name="package_description" rows="3" required></textarea></label>
+   <div class="row">
+    <label>Service needed
+     <select name="service" required>
+      <option value="">Choose a service</option>
+      <option>Pickup and Delivery</option><option>Same-Day Delivery</option><option>Interstate Waybill</option><option>Home Delivery</option><option>Office / Corporate Delivery</option><option>E-Commerce Delivery</option><option>Payment on Delivery</option>
+     </select>
+    </label>
+    <label>Preferred pickup date <input name="pickup_date" type="date"></label>
+   </div>
+   <label>Special instructions (optional) <textarea name="instructions" rows="2"></textarea></label>
+   <button class="btn" type="submit">Send booking request</button>
+   <p class="note">Delivery charges are confirmed by our team after you submit. Nothing is charged by this form.</p>
+  </form><p class="note">Delivery charges are confirmed by our team after you submit. Nothing is charged by this form.</p></div></section></main>
+<footer><div class="wrap"><img src="logo.png" alt="BGC Logistics logo"><p><b style="color:#fff">BGC Logistics</b> &ndash; Your Reliable Delivery Partner.<br>We Pick. We Deliver. You Track.</p><p>Registered company: RC 9411177<br>Lagos Island: 35 Isale Agbede Street, off Idumagbo Avenue.<br>Lagos Mainland: Shop 3, Hon. Obafemi Saheed Block, Babajide Sanwolu Market, Ikosi Ketu.</p><p><a href="tel:09021317371">09021317371</a> &middot; <a href="mailto:bgclogistics2050@gmail.com">bgclogistics2050@gmail.com</a></p><p><a href="book.html">Book a Delivery</a> &middot; <a href="account.html">Customer Account</a> &middot; <a href="privacy.html">Privacy Policy</a> &middot; <a href="terms.html">Terms and Conditions</a></p><p>&copy; BGC Logistics</p></div></footer></body></html>
