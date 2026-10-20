@@ -1,0 +1,102 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Staff | BGC Logistics</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#151515;color:#fff}
+.w{max-width:640px;margin:0 auto;padding:16px}
+h1{color:#D4AF37;font-size:1.5rem}
+h2{font-size:1.15rem;margin:0 0 6px}
+.c{background:#222;border:1px solid #D4AF37;border-radius:10px;padding:14px;margin:14px 0}
+label{display:block;margin:10px 0 4px}
+input,select{width:100%;padding:12px;font-size:1rem;border-radius:8px;border:1px solid #D4AF37;background:#fff;color:#000;box-sizing:border-box}
+button{padding:12px 16px;font-size:1rem;font-weight:bold;border:0;border-radius:8px;background:#D4AF37;color:#000;margin-top:12px;cursor:pointer}
+button.g{background:#fff}
+.m{margin:10px 0;color:#D4AF37}
+.m.e{color:#ff8a65}
+.t{font-weight:bold;color:#D4AF37;font-size:1.1rem}
+</style></head><body><div class="w">
+<h1>BGC Logistics Staff</h1>
+<div id="msg" class="m" aria-live="polite"></div>
+<div id="login" class="c">
+ <h2>Staff login</h2>
+ <label for="em">Email</label><input id="em" type="email" autocomplete="username">
+ <label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password">
+ <button id="lb" type="button">Log in</button>
+</div>
+<div id="panel" style="display:none">
+ <div class="c">
+  <h2>Add a new package</h2>
+  <label for="ns">Starting status</label><select id="ns"></select>
+  <label for="nn">Note (optional)</label><input id="nn" type="text" placeholder="Example: Received at Ikosi Ketu branch">
+  <button id="ab" type="button">Add package</button>
+ </div>
+ <h2>Latest packages</h2>
+ <div id="list"></div>
+ <button id="rf" class="g" type="button">Refresh list</button>
+ <button id="ob" class="g" type="button">Log out</button>
+</div>
+</div>
+<script>
+(function(){
+var URL="https://rtygothuagxvqoojcykb.supabase.co";
+var KEY="sb_publishable_itNJRAdWKG0yzgMiokG_gw_DVHdfC10";
+var STATUSES=["Booking Received","Confirmed","Picked Up","In Transit","Arrived at Branch","Out for Delivery","Delivered","Delivery Attempted","Delayed","Cancelled"];
+var token=null;
+function $(i){return document.getElementById(i)}
+function say(t,bad){var m=$("msg");m.textContent=t;m.className=bad?"m e":"m"}
+function fill(sel,cur){STATUSES.forEach(function(s){var o=document.createElement("option");o.value=s;o.textContent=s;if(s===cur)o.selected=true;sel.appendChild(o)})}
+function view(){$("login").style.display=token?"none":"block";$("panel").style.display=token?"block":"none"}
+function out(){token=null;try{sessionStorage.removeItem("bgct")}catch(e){}view()}
+function api(path,opt){
+ opt=opt||{};
+ var h={apikey:KEY,"Content-Type":"application/json"};
+ if(token)h.Authorization="Bearer "+token;
+ if(opt.prefer)h.Prefer=opt.prefer;
+ return fetch(URL+path,{method:opt.method||"GET",headers:h,body:opt.body?JSON.stringify(opt.body):undefined}).then(function(r){
+  if(r.status===401){out();throw new Error("Please log in again.")}
+  if(!r.ok)throw new Error("Could not save. Please check and try again.");
+  return r.text().then(function(t){return t?JSON.parse(t):null})
+ })
+}
+function login(){
+ say("Logging in...");
+ fetch(URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json"},body:JSON.stringify({email:$("em").value.trim(),password:$("pw").value})})
+ .then(function(r){return r.json().then(function(j){if(!r.ok||!j.access_token)throw new Error("Wrong email or password.");return j})})
+ .then(function(j){token=j.access_token;try{sessionStorage.setItem("bgct",token)}catch(e){}$("pw").value="";view();say("");load()})
+ .catch(function(e){say(e.message,true)})
+}
+function add(){
+ var a=new Uint8Array(4);crypto.getRandomValues(a);
+ var code="BGC-"+Array.prototype.map.call(a,function(b){return("0"+b.toString(16)).slice(-2)}).join("").toUpperCase();
+ api("/rest/v1/shipments",{method:"POST",prefer:"return=minimal",body:{tracking_number:code,status:$("ns").value,note:$("nn").value.trim()||null}})
+ .then(function(){say("Package added. Tracking number: "+code);$("nn").value="";load()})
+ .catch(function(e){say(e.message,true)})
+}
+function load(){
+ api("/rest/v1/shipments?select=id,tracking_number,status,note&order=created_at.desc&limit=30").then(function(rows){
+  var box=$("list");box.textContent="";
+  if(!rows||!rows.length){box.textContent="No packages yet.";return}
+  rows.forEach(function(r){
+   var d=document.createElement("div");d.className="c";
+   var t=document.createElement("div");t.className="t";t.textContent=r.tracking_number;d.appendChild(t);
+   var s=document.createElement("select");fill(s,r.status);d.appendChild(s);
+   var n=document.createElement("input");n.type="text";n.placeholder="Note (optional)";n.value=r.note||"";n.style.marginTop="8px";d.appendChild(n);
+   var b=document.createElement("button");b.type="button";b.textContent="Save status";
+   b.addEventListener("click",function(){
+    api("/rest/v1/shipments?id=eq."+r.id,{method:"PATCH",prefer:"return=minimal",body:{status:s.value,note:n.value.trim()||null}})
+    .then(function(){say("Saved: "+r.tracking_number+" is now "+s.value)})
+    .catch(function(e){say(e.message,true)})
+   });
+   d.appendChild(b);box.appendChild(d)
+  })
+ }).catch(function(e){say(e.message,true)})
+}
+fill($("ns"),"Booking Received");
+$("lb").addEventListener("click",login);
+$("pw").addEventListener("keydown",function(e){if(e.key==="Enter")login()});
+$("ab").addEventListener("click",add);
+$("rf").addEventListener("click",load);
+$("ob").addEventListener("click",function(){out();say("You are logged out.")});
+try{token=sessionStorage.getItem("bgct")}catch(e){}
+view();if(token)load();
+})();
+</script>
+</body></html>
