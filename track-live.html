@@ -1,0 +1,60 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Track Your Package | BGC Logistics</title><meta name="description" content="Get the latest status of your BGC Logistics shipment."><meta property="og:title" content="Track Your Package | BGC Logistics"><meta property="og:image" content="logo.png"><meta name="theme-color" content="#151515"><link rel="icon" href="logo.png"><link rel="stylesheet" href="style.css"></head><body>
+<header class="top"><div class="wrap"><a href="index.html" aria-label="BGC Logistics home"><img src="logo.png" alt="BGC Logistics logo"></a><a class="btn" href="book.html">Book a Delivery</a></div><nav aria-label="Main"><div class="wrap"><a href="index.html">Home</a><a href="about.html">About Us</a><a href="services.html">Services</a><a href="locations.html">Delivery Locations</a><a href="vendors.html">E-Commerce Vendors</a><a href="partnerships.html">Partnerships</a><a href="track.html" aria-current="page" style="color:#D4AF37">Track Package</a><a href="contact.html">Contact</a></div></nav></header>
+<main><section id="track">
+ <div class="wrap">
+  <h1 style="font-size:clamp(1.8rem,6vw,2.6rem)">Track Your Package</h1>
+  <p>Type your tracking number to see the latest status of your package.</p>
+  <form id="trackForm" novalidate>
+   <label for="code">Tracking number
+    <input id="code" name="code" type="text" placeholder="Example: BGC-1A2B3C4D" autocomplete="off" autocapitalize="characters" required>
+   </label>
+   <button class="btn" type="submit" id="go">Track package</button>
+  </form>
+  <div id="result" role="status" aria-live="polite" style="margin-top:24px"></div>
+  <p class="note">Our staff update each status by hand, so a new update can take a little time to appear. Need help? <a href="https://wa.me/2348064496159?text=Hello%20BGC%20Logistics%2C%20please%20update%20me%20on%20my%20package." target="_blank" rel="noopener">Ask on WhatsApp</a> or call 09050612297.</p>
+ </div>
+</section></main>
+<footer><div class="wrap"><img src="logo.png" alt="BGC Logistics logo"><p><b style="color:#fff">BGC Logistics</b> &ndash; Your Reliable Delivery Partner.<br>We Pick. We Deliver. You Track.</p><p>Registered company: RC 9411177<br>Lagos Island: 35 Isale Agbede Street, off Idumagbo Avenue.<br>Lagos Mainland: Shop 3, Hon. Obafemi Saheed Block, Babajide Sanwolu Market, Ikosi Ketu.</p><p><a href="tel:09021317371">09021317371</a> &middot; <a href="mailto:bgclogistics2050@gmail.com">bgclogistics2050@gmail.com</a></p><p><a href="book.html">Book a Delivery</a> &middot; <a href="account.html">Customer Account</a> &middot; <a href="privacy.html">Privacy Policy</a> &middot; <a href="terms.html">Terms and Conditions</a></p><p>&copy; BGC Logistics</p></div></footer>
+<script>
+(function(){
+ var URL_BASE="https://rtygothuagxvqoojcykb.supabase.co";
+ var KEY="sb_publishable_itNJRAdWKG0yzgMiokG_gw_DVHdfC10";
+ var form=document.getElementById("trackForm"),input=document.getElementById("code"),out=document.getElementById("result"),btn=document.getElementById("go");
+ function clear(){while(out.firstChild)out.removeChild(out.firstChild);}
+ function el(tag,text,css){var e=document.createElement(tag);if(text)e.textContent=text;if(css)e.style.cssText=css;return e;}
+ function when(s){try{return new Date(s).toLocaleString("en-NG",{timeZone:"Africa/Lagos",day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit"});}catch(e){return "";}}
+ function msg(text){clear();out.appendChild(el("p",text));}
+ form.addEventListener("submit",function(ev){
+  ev.preventDefault();
+  var code=input.value.trim();
+  if(!code){msg("Please type your tracking number.");return;}
+  btn.disabled=true;msg("Checking…");
+  fetch(URL_BASE+"/rest/v1/rpc/track_package",{method:"POST",headers:{"apikey":KEY,"Content-Type":"application/json"},body:JSON.stringify({code:code})})
+  .then(function(r){if(!r.ok)throw new Error("bad");return r.json();})
+  .then(function(d){
+   btn.disabled=false;
+   if(!d){msg("We could not find that tracking number. Check it and try again, or contact us.");return;}
+   clear();
+   var box=el("div","","background:#fff;border-left:5px solid #D4AF37;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.12)");
+   box.appendChild(el("p","Tracking number: "+d.tracking_number,"margin:0 0 6px;color:#6B6B6B"));
+   box.appendChild(el("h2",d.status,"margin:0 0 6px;font-size:1.6rem"));
+   if(d.note)box.appendChild(el("p",d.note,"margin:0"));
+   out.appendChild(box);
+   if(d.history&&d.history.length){
+    out.appendChild(el("h3","Package history","margin:22px 0 8px"));
+    var ul=el("ul","","list-style:none;padding:0;margin:0;display:grid;gap:10px");
+    d.history.forEach(function(h){
+     var li=el("li","","border-top:3px solid #A85D24;padding-top:8px");
+     li.appendChild(el("b",h.status));
+     li.appendChild(el("div",when(h.at),"font-size:.92rem;color:#6B6B6B"));
+     if(h.note)li.appendChild(el("div",h.note,"font-size:.95rem"));
+     ul.appendChild(li);
+    });
+    out.appendChild(ul);
+   }
+  })
+  .catch(function(){btn.disabled=false;msg("Tracking is not available right now. Please try again later or contact us on WhatsApp.");});
+ });
+})();
+</script>
+</body></html>
